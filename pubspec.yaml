@@ -12,6 +12,9 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.2
+  flutter_local_notifications: ^9.7.0
+  timezone: ^0.8.0
+  rxdart: ^0.27.5
 
 dev_dependencies:
   flutter_test:

@@ -1,8 +1,10 @@
 import 'dart:ui';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:flutter_push_notifications/utils/download_util.dart';
 import 'package:rxdart/subjects.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 class NotificationService {
@@ -28,8 +30,17 @@ class NotificationService {
       iOS: initializationSettingsIOS,
     );
 
-    await _localNotifications.initialize(initializationSettings,
-        onSelectNotification: selectNotification);
+    tz.initializeTimeZones();
+    tz.setLocalLocation(
+      tz.getLocation(
+        await FlutterNativeTimezone.getLocalTimezone(),
+      ),
+    );
+
+    await _localNotifications.initialize(
+      initializationSettings,
+      onSelectNotification: selectNotification,
+    );
   }
 
   Future<NotificationDetails> _notificationDetails() async {
@@ -41,10 +52,13 @@ class NotificationService {
         AndroidNotificationDetails(
       'channel id',
       'channel name',
+      groupKey: 'com.example.flutter_push_notifications',
       channelDescription: 'channel description',
+      setAsGroupSummary: true,
       importance: Importance.max,
       priority: Priority.max,
       playSound: true,
+      ticker: 'ticker',
       largeIcon: FilePathAndroidBitmap(bigPicture),
       styleInformation: BigPictureStyleInformation(
         FilePathAndroidBitmap(bigPicture),
@@ -55,6 +69,11 @@ class NotificationService {
 
     const IOSNotificationDetails iosNotificationDetails =
         IOSNotificationDetails();
+
+    final details = await _localNotifications.getNotificationAppLaunchDetails();
+    if (details != null && details.didNotificationLaunchApp) {
+      behaviorSubject.add(details.payload!);
+    }
 
     NotificationDetails platformChannelSpecifics = NotificationDetails(
         android: androidPlatformChannelSpecifics, iOS: iosNotificationDetails);
@@ -131,4 +150,6 @@ class NotificationService {
       behaviorSubject.add(payload);
     }
   }
+
+  void cancelAllNotifications() => _localNotifications.cancelAll();
 }

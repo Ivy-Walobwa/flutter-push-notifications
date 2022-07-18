@@ -99,6 +99,24 @@ class NotificationService {
     );
   }
 
+  Future<void> showPeriodicLocalNotification({
+    required int id,
+    required String title,
+    required String body,
+    required String payload,
+  }) async {
+    final platformChannelSpecifics = await _notificationDetails();
+    await _localNotifications.periodicallyShow(
+      id,
+      title,
+      body,
+      RepeatInterval.everyMinute,
+      platformChannelSpecifics,
+      payload: payload,
+      androidAllowWhileIdle: true,
+    );
+  }
+
   void onDidReceiveLocalNotification(
     int id,
     String? title,

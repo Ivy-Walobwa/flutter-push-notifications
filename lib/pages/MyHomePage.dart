@@ -54,15 +54,26 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: const Text("Drink Now")),
               ElevatedButton(
                   onPressed: () async {
-                    await notificationService.showPeriodicLocalNotification(
-                      id: 0,
-                      title: "Drink Water",
-                      body: "Time to drink some water!",
-                      payload: "You just took water! Huurray!",
-                    );
+                    await notificationService.showScheduledLocalNotification(
+                        id: 1,
+                        title: "Drink Water",
+                        body: "Time to drink some water!",
+                        payload: "You just took water! Huurray!",
+                        seconds: 2);
                   },
                   child: const Text("Schedule Drink "))
             ],
+          ),
+          Container(
+            margin: const EdgeInsets.only(top: 20.0),
+            child: ElevatedButton(
+              onPressed: () {
+                notificationService.cancelAllNotifications();
+              },
+              child: const Text(
+                "Cancel All",
+              ),
+            ),
           )
         ],
       ),

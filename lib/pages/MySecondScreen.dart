@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class MySecondScreen extends StatelessWidget {
-  const MySecondScreen({Key? key}) : super(key: key);
+  final String payload;
+  const MySecondScreen({Key? key, required this.payload}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -9,7 +10,6 @@ class MySecondScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text("JustWater"),
         centerTitle: true,
-
       ),
       body: Center(
         child: Column(
@@ -17,12 +17,14 @@ class MySecondScreen extends StatelessWidget {
           children: [
             Container(
               margin: const EdgeInsets.only(bottom: 100),
-              child: Image.asset("assets/images/justwater.png", ),
+              child: Image.asset(
+                "assets/images/justwater.png",
+              ),
             ),
-            const Text("You just took water! Huurray!")
+            Text(payload)
           ],
         ),
       ),
-    );;
+    );
   }
 }

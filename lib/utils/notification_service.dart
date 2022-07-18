@@ -2,9 +2,13 @@ import 'dart:ui';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_push_notifications/utils/download_util.dart';
+import 'package:rxdart/subjects.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 class NotificationService {
   NotificationService();
+
+  final BehaviorSubject<String> behaviorSubject = BehaviorSubject();
 
   final _localNotifications = FlutterLocalNotificationsPlugin();
   Future<void> initializePlatformNotifications() async {
@@ -41,7 +45,7 @@ class NotificationService {
       importance: Importance.max,
       priority: Priority.max,
       playSound: true,
-      largeIcon: const DrawableResourceAndroidBitmap('justwater'),
+      largeIcon: FilePathAndroidBitmap(bigPicture),
       styleInformation: BigPictureStyleInformation(
         FilePathAndroidBitmap(bigPicture),
         hideExpandedLargeIcon: false,
@@ -58,10 +62,32 @@ class NotificationService {
     return platformChannelSpecifics;
   }
 
+  Future<void> showScheduledLocalNotification({
+    required int id,
+    required String title,
+    required String body,
+    required String payload,
+    required int seconds,
+  }) async {
+    final platformChannelSpecifics = await _notificationDetails();
+    await _localNotifications.zonedSchedule(
+      id,
+      title,
+      body,
+      tz.TZDateTime.now(tz.local).add(Duration(seconds: seconds)),
+      platformChannelSpecifics,
+      payload: payload,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+      androidAllowWhileIdle: true,
+    );
+  }
+
   Future<void> showLocalNotification({
     required int id,
     required String title,
     required String body,
+    required String payload,
   }) async {
     final platformChannelSpecifics = await _notificationDetails();
     await _localNotifications.show(
@@ -69,7 +95,7 @@ class NotificationService {
       title,
       body,
       platformChannelSpecifics,
-      payload: 'item x',
+      payload: payload,
     );
   }
 
@@ -83,6 +109,8 @@ class NotificationService {
   }
 
   void selectNotification(String? payload) {
-    print('payload $payload');
+    if (payload != null && payload.isNotEmpty) {
+      behaviorSubject.add(payload);
+    }
   }
 }

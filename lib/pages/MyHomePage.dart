@@ -1,7 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_push_notifications/utils/notification_service.dart';
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  late final NotificationService notificationService;
+  @override
+  void initState() {
+    notificationService = NotificationService();
+    notificationService.initializePlatformNotifications();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +35,12 @@ class MyHomePage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               ElevatedButton(
-                  onPressed: () => print("drink now"),
+                  onPressed: () async {
+                    await notificationService.showLocalNotification(
+                        id: 0,
+                        title: "Drink Water",
+                        body: "Time to drink some water!");
+                  },
                   child: const Text("Drink Now")),
               ElevatedButton(
                   onPressed: () => print("schedule drink"),

@@ -47,7 +47,7 @@ class NotificationService {
   Future<NotificationDetails> _notificationDetails() async {
     final bigPicture = await DownloadUtil.downloadAndSaveFile(
         "https://images.unsplash.com/photo-1624948465027-6f9b51067557?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80",
-        "drinkwater");
+        Platform.isIOS ? "drinkwater.jpg" : "drinkwater");
 
     AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
@@ -67,8 +67,11 @@ class NotificationService {
       color: const Color(0xff2196f3),
     );
 
-    const IOSNotificationDetails iosNotificationDetails =
-        IOSNotificationDetails(threadIdentifier: "thread1");
+    IOSNotificationDetails iosNotificationDetails = IOSNotificationDetails(
+        threadIdentifier: "thread1",
+        attachments: <IOSNotificationAttachment>[
+          IOSNotificationAttachment(bigPicture)
+        ]);
 
     final details = await _localNotifications.getNotificationAppLaunchDetails();
     if (details != null && details.didNotificationLaunchApp) {
